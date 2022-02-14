@@ -1,10 +1,40 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-namespace DSP_TrafficSelection {
+namespace TrafficSelection {
     public static class Util {
         public static Color DSPBlue => new Color(0.3821f, 0.8455f, 1f, 0.7059f);
         public static Color DSPOrange => new Color(0.9906f, 0.5897f, 0.3691f, 0.7059f);
+
+        public static RectTransform NormalizeRectTopLeft(GameObject go, float width = 0, float height = 0) {
+            RectTransform rect = (RectTransform) go.transform;
+            rect.anchorMax = Vector2.zero;
+            rect.anchorMin = Vector2.zero;
+            rect.pivot = Vector2.zero;
+            if (width > 0 && height > 0) {
+                rect.sizeDelta = new Vector2(width, height);
+            }
+            return rect;
+        }
+
+        public static RectTransform NormalizeRectFull(GameObject go) {
+            RectTransform rect = (RectTransform) go.transform;
+            rect.anchorMax = Vector2.one;
+            rect.anchorMin = Vector2.zero;
+            rect.pivot = new Vector2(0.5f, 0.5f);
+            return rect;
+        }
+
+        public static RectTransform NormalizeRectCenter(GameObject go, float width = 0, float height = 0) {
+            RectTransform rect = (RectTransform) go.transform;
+            rect.anchorMax = new Vector2(0.5f, 0.5f);
+            rect.anchorMin = new Vector2(0.5f, 0.5f);
+            rect.pivot = new Vector2(0.5f, 0.5f);
+            if (width > 0 && height > 0) {
+                rect.sizeDelta = new Vector2(width, height);
+            }
+            return rect;
+        }
 
         public static Sprite LoadSpriteResource(string path) {
             Sprite s = Resources.Load<Sprite>(path);

@@ -3,7 +3,7 @@ using crecheng.DSPModSave;
 using HarmonyLib;
 using UnityEngine;
 
-namespace DSP_TrafficSelection {
+namespace TrafficSelection {
     [BepInPlugin(PluginGuid, PluginName, PluginVersion)]
     [BepInProcess("DSPGAME.exe")]
     [BepInDependency(DSPModSavePlugin.MODGUID)]
@@ -13,14 +13,18 @@ namespace DSP_TrafficSelection {
         private const string PluginVersion = "0.0.1";
 
         internal static bool _initialized = false;
+        public static UIFilterWindow _win;
 
         internal void Awake() {
             var harmony = new Harmony(PluginGuid);
             Harmony.CreateAndPatchAll(typeof(TrafficSelectionPlugin));
+            Harmony.CreateAndPatchAll(typeof(StarDistance.Patch));
         }
 
         internal static void AddButtonToStationWindow() {
             UIStationWindow stationWindow = UIRoot.instance.uiGame.stationWindow;
+
+            UIStationStorageParasite.win = _win;
 
             UIStationStorage[] storageUIs = AccessTools.FieldRefAccess<UIStationWindow, UIStationStorage[]>(stationWindow, "storageUIs");
             for (int i = 0; i < storageUIs.Length; i++) {
@@ -32,9 +36,28 @@ namespace DSP_TrafficSelection {
         public static void UIGame__OnCreate_Postfix() {
             if (!_initialized) {
                 _initialized = true;
+                _win = UIFilterWindow.CreateWindow("TrafficSelector", "STS");
 
                 AddButtonToStationWindow();
             }
+        }
+
+        [HarmonyPostfix, HarmonyPatch(typeof(UIGame), "_OnInit")]
+        public static void UIGame__OnInit_Postfix(UIGame __instance) {
+            _win._Init(_win.data);
+        }
+
+        [HarmonyPostfix, HarmonyPatch(typeof(UIGame), "_OnFree")]
+        public static void UIGame__OnFree_Postfix() {
+            _win._Free();
+        }
+
+        [HarmonyPostfix, HarmonyPatch(typeof(UIGame), "_OnUpdate")]
+        public static void UIGame__OnUpdate_Postfix() {
+            if (GameMain.isPaused || !GameMain.isRunning) {
+                return;
+            }
+            _win._Update();
         }
 
         [HarmonyPostfix, HarmonyPatch(typeof(UIStationStorage), "RefreshValues")]
@@ -46,6 +69,26 @@ namespace DSP_TrafficSelection {
         public static bool StationComponent_AddRemotePair_Prefix(StationComponent __instance, int sId, int sIdx, int dId, int dIdx) {
             Debug.Log("AddRemotePair: " + sId + " " + sIdx + " " + dId + " " + dIdx);
             return false;
+        }
+
+        [HarmonyPostfix, HarmonyPatch(typeof(UIGame), "ShutAllFunctionWindow")]
+        public static void UIGame_ShutAllFunctionWindow_Postfix()
+        {
+            _win.Close();
+        }
+
+        [HarmonyPostfix, HarmonyPatch(typeof(VFInput), "get__cameraZoomIn")]
+        public static void VFInput__cameraZoomIn_Postfix(ref float __result) {
+            if (_win.isPointEnter) {
+                __result = 0f;
+            }
+        }
+
+        [HarmonyPostfix, HarmonyPatch(typeof(VFInput), "get__cameraZoomOut")]
+        public static void VFInput__cameraZoomOut_Postfix(ref float __result) {
+            if (_win.isPointEnter) {
+                __result = 0f;
+            }
         }
     }
 }

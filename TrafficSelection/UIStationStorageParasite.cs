@@ -1,9 +1,11 @@
 ﻿using UnityEngine;
 
-namespace DSP_TrafficSelection {
+namespace TrafficSelection {
     public class UIStationStorageParasite : MonoBehaviour {
-        public UIStationStorage uiStorage;
+        public static UIFilterWindow win;
 
+        public UIStationStorage uiStorage;
+ 
         [SerializeField] public UIButton filterBtn;
 
         void Start() {
@@ -26,6 +28,7 @@ namespace DSP_TrafficSelection {
         }
 
         public void OpenFilter(int obj) {
+            win.SetUpAndOpen(uiStorage.station, uiStorage.index);
         }
 
         public static UIStationStorageParasite MakeUIStationStorageParasite(UIStationStorage stationStorage) {

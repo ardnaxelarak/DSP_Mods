@@ -7,8 +7,8 @@
     <ProjectGuid>{9835E2EC-26B8-4811-87CD-18554025B6AD}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DSP_TrafficSelection</RootNamespace>
-    <AssemblyName>DSP_TrafficSelection</AssemblyName>
+    <RootNamespace>TrafficSelection</RootNamespace>
+    <AssemblyName>TrafficSelection</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -31,8 +31,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="netstandard" />
     <Reference Include="DSPModSave">
       <HintPath>..\libs\DSPModSave.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -66,13 +68,21 @@
       <HintPath>..\libs\UnityEngine.CoreModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="UnityEngine.TextRenderingModule">
+      <HintPath>..\libs\UnityEngine.TextRenderingModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="UnityEngine.UI">
       <HintPath>..\libs\UnityEngine.UI.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extensions.cs" />
+    <Compile Include="StarDistance.cs" />
+    <Compile Include="UIFilterWindow.cs" />
     <Compile Include="UIStationStorageParasite.cs" />
+    <Compile Include="UISupplyListEntry.cs" />
     <Compile Include="Util.cs" />
     <Compile Include="TrafficSelectionPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
