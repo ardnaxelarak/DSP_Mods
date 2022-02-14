@@ -8,7 +8,7 @@ namespace TrafficSelection {
  
         [SerializeField] public UIButton filterBtn;
 
-        void Start() {
+        internal void Start() {
             if (filterBtn != null) {
                 filterBtn.onClick += OpenFilter;
             }

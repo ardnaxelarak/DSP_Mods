@@ -16,7 +16,7 @@ namespace TrafficSelection {
         public static UIFilterWindow _win;
 
         internal void Awake() {
-            var harmony = new Harmony(PluginGuid);
+            new Harmony(PluginGuid);
             Harmony.CreateAndPatchAll(typeof(TrafficSelectionPlugin));
             Harmony.CreateAndPatchAll(typeof(StarDistance.Patch));
         }
@@ -43,7 +43,7 @@ namespace TrafficSelection {
         }
 
         [HarmonyPostfix, HarmonyPatch(typeof(UIGame), "_OnInit")]
-        public static void UIGame__OnInit_Postfix(UIGame __instance) {
+        public static void UIGame__OnInit_Postfix() {
             _win._Init(_win.data);
         }
 
@@ -66,7 +66,7 @@ namespace TrafficSelection {
         }
 
         [HarmonyPrefix, HarmonyPatch(typeof(StationComponent), "AddRemotePair")]
-        public static bool StationComponent_AddRemotePair_Prefix(StationComponent __instance, int sId, int sIdx, int dId, int dIdx) {
+        public static bool StationComponent_AddRemotePair_Prefix(int sId, int sIdx, int dId, int dIdx) {
             Debug.Log("AddRemotePair: " + sId + " " + sIdx + " " + dId + " " + dIdx);
             return false;
         }

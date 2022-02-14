@@ -115,11 +115,7 @@ namespace TrafficSelection {
                     RectTransform rect5 = (RectTransform)activeBtn.transform;
                     rect5.anchoredPosition = new Vector2(290f, 0f);
                     activeBtn.SetActive(true);
-                } else {
-                    Debug.Log("btn is null, boo");
                 }
-            } else {
-                Debug.Log("bg is null, boo");
             }
 
             GameObject.Destroy(go.transform.Find("current-count-label")?.gameObject);
