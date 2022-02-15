@@ -20,9 +20,9 @@ namespace TrafficSelection {
                 }
             } else {
                 if (station.storage.Length > 3) {
-                    return String.Format("Planetary Giga Station #{0}", station.gid);
+                    return String.Format("Planetary Giga Station #{0}", station.id);
                 } else {
-                    return String.Format("Local Station #{0}", station.gid);
+                    return String.Format("Local Station #{0}", station.id);
                 }
             }
         }

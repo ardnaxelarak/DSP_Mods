@@ -1,15 +1,17 @@
 ﻿using BepInEx;
 using crecheng.DSPModSave;
 using HarmonyLib;
-using System;
+using NebulaAPI;
 using System.IO;
+using System.Reflection;
 using UnityEngine;
 
 namespace TrafficSelection {
     [BepInPlugin(PluginGuid, PluginName, PluginVersion)]
     [BepInProcess("DSPGAME.exe")]
     [BepInDependency(DSPModSavePlugin.MODGUID)]
-    public class TrafficSelectionPlugin : BaseUnityPlugin, IModCanSave {
+    [BepInDependency(NebulaModAPI.API_GUID)]
+    public class TrafficSelectionPlugin : BaseUnityPlugin, IModCanSave, IMultiplayerModWithSettings {
         private const string PluginGuid = "com.ardnaxelarak.dsp.TrafficSelection";
         private const string PluginName = "TrafficSelection";
         private const string PluginVersion = "0.0.1";
@@ -17,11 +19,13 @@ namespace TrafficSelection {
         internal static bool _initialized = false;
         public static UIFilterWindow _win;
 
+        public string Version => PluginVersion;
 
         internal void Awake() {
             new Harmony(PluginGuid);
             Harmony.CreateAndPatchAll(typeof(TrafficSelectionPlugin));
             Harmony.CreateAndPatchAll(typeof(StarDistance.Patch));
+            NebulaModAPI.RegisterPackets(Assembly.GetExecutingAssembly());
         }
 
         internal static void AddButtonToStationWindow() {
@@ -39,7 +43,7 @@ namespace TrafficSelection {
         public static void UIGame__OnCreate_Postfix() {
             if (!_initialized) {
                 _initialized = true;
-                _win = UIFilterWindow.CreateWindow("TrafficSelector", "STS");
+                _win = UIFilterWindow.CreateWindow("TrafficSelector", "Remote Filtering");
 
                 AddButtonToStationWindow();
             }
@@ -70,8 +74,15 @@ namespace TrafficSelection {
 
         [HarmonyPrefix, HarmonyPatch(typeof(StationComponent), "AddRemotePair")]
         public static bool StationComponent_AddRemotePair_Prefix(int sId, int sIdx, int dId, int dIdx) {
-            Debug.Log("AddRemotePair: " + sId + " " + sIdx + " " + dId + " " + dIdx);
-            return false;
+            GalacticTransport galacticTransport = GameMain.data.galacticTransport;
+
+            StationComponent supply = galacticTransport.stationPool[sId];
+            StationComponent demand = galacticTransport.stationPool[dId];
+
+            RemoteIdentifier supplyIdent = FilterProcessor.GetIdentifier(supply, supply.storage[sIdx].itemId);
+            RemoteIdentifier demandIdent = FilterProcessor.GetIdentifier(demand, demand.storage[dIdx].itemId);
+
+            return FilterProcessor.Instance.GetValue(supplyIdent, demandIdent).allowed;
         }
 
         [HarmonyPostfix, HarmonyPatch(typeof(UIGame), "ShutAllFunctionWindow")]
@@ -104,6 +115,10 @@ namespace TrafficSelection {
 
         public void IntoOtherSave() {
             FilterProcessor.Instance.Clear();
+        }
+
+        public bool CheckVersion(string hostVersion, string clientVersion) {
+            return hostVersion.Equals(clientVersion);
         }
     }
 }
