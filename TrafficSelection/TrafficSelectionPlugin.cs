@@ -1,19 +1,22 @@
 ﻿using BepInEx;
 using crecheng.DSPModSave;
 using HarmonyLib;
+using System;
+using System.IO;
 using UnityEngine;
 
 namespace TrafficSelection {
     [BepInPlugin(PluginGuid, PluginName, PluginVersion)]
     [BepInProcess("DSPGAME.exe")]
     [BepInDependency(DSPModSavePlugin.MODGUID)]
-    public class TrafficSelectionPlugin : BaseUnityPlugin {
+    public class TrafficSelectionPlugin : BaseUnityPlugin, IModCanSave {
         private const string PluginGuid = "com.ardnaxelarak.dsp.TrafficSelection";
         private const string PluginName = "TrafficSelection";
         private const string PluginVersion = "0.0.1";
 
         internal static bool _initialized = false;
         public static UIFilterWindow _win;
+
 
         internal void Awake() {
             new Harmony(PluginGuid);
@@ -89,6 +92,18 @@ namespace TrafficSelection {
             if (_win.isPointEnter) {
                 __result = 0f;
             }
+        }
+
+        public void Export(BinaryWriter w) {
+            FilterProcessor.Instance.WriteSerialization(w);
+        }
+
+        public void Import(BinaryReader r) {
+            FilterProcessor.Instance.ReadSerialization(r);
+        }
+
+        public void IntoOtherSave() {
+            FilterProcessor.Instance.Clear();
         }
     }
 }

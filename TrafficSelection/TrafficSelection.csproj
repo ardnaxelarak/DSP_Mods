@@ -72,6 +72,10 @@
       <HintPath>..\libs\UnityEngine.TextRenderingModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="UnityEngine.JSONSerializeModule">
+      <HintPath>..\libs\UnityEngine.JSONSerializeModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="UnityEngine.UI">
       <HintPath>..\libs\UnityEngine.UI.dll</HintPath>
       <Private>False</Private>
@@ -79,10 +83,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Extensions.cs" />
+    <Compile Include="FilterProcessor.cs" />
     <Compile Include="StarDistance.cs" />
     <Compile Include="UIFilterWindow.cs" />
     <Compile Include="UIStationStorageParasite.cs" />
-    <Compile Include="UISupplyListEntry.cs" />
+    <Compile Include="UIRemoteListEntry.cs" />
     <Compile Include="Util.cs" />
     <Compile Include="TrafficSelectionPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

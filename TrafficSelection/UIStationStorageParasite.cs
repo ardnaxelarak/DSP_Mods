@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 
 namespace TrafficSelection {
     public class UIStationStorageParasite : MonoBehaviour {
@@ -22,6 +23,16 @@ namespace TrafficSelection {
 
             if (uiStorage.station.storage[uiStorage.index].remoteLogic == ELogisticStorage.Demand) {
                 filterBtn.gameObject.SetActive(true);
+                Image img = filterBtn.gameObject.transform.Find("icon")?.gameObject.GetComponent<Image>();
+                if (img != null) {
+                    img.color = Util.DSPBlue;
+                }
+            } else if (uiStorage.station.storage[uiStorage.index].remoteLogic == ELogisticStorage.Supply) {
+                filterBtn.gameObject.SetActive(true);
+                Image img = filterBtn.gameObject.transform.Find("icon")?.gameObject.GetComponent<Image>();
+                if (img != null) {
+                    img.color = Util.DSPOrange;
+                }
             } else {
                 filterBtn.gameObject.SetActive(false);
             }

@@ -7,9 +7,11 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
 namespace TrafficSelection {
-    public class UISupplyListEntry : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler {
+    public class UIRemoteListEntry : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler {
+        public RemoteIdentifier supply;
+        public RemoteIdentifier demand;
         public StationComponent station;
-        public int index;
+
         public int itemId;
         public int planetId;
 
@@ -17,7 +19,7 @@ namespace TrafficSelection {
 
         public int stationMaxItemCount = 0;
 
-        public ESupplyType supplyType;
+        public ERemoteType remoteType;
 
         [SerializeField]
         public Image itemImage;
@@ -31,11 +33,12 @@ namespace TrafficSelection {
         [SerializeField]
         public Text planetText;
 
-        [SerializeField]
-        public UIButton itemButton;
 
         [SerializeField]
         public Image activeIcon;
+
+        [SerializeField]
+        public UIButton activeButton;
 
         [SerializeField]
         public Sprite toggleOnSprite;
@@ -43,14 +46,13 @@ namespace TrafficSelection {
         [SerializeField]
         public Sprite toggleOffSprite;
 
-        public static UISupplyListEntry CreatePrefab() {
+        public static UIRemoteListEntry CreatePrefab() {
             UIStationWindow stationWindow = UIRoot.instance.uiGame.stationWindow;
 
             UIStationStorage storageUIPrefab = stationWindow.storageUIPrefab;
             UIStationStorage src = GameObject.Instantiate<UIStationStorage>(storageUIPrefab);
-            UISupplyListEntry prefab = src.gameObject.AddComponent<UISupplyListEntry>();
+            UIRemoteListEntry prefab = src.gameObject.AddComponent<UIRemoteListEntry>();
             prefab.itemImage = src.itemImage;
-            prefab.itemButton = src.itemButton;
 
             GameObject.Destroy(src);
 
@@ -105,7 +107,8 @@ namespace TrafficSelection {
                     GameObject.Destroy(activeBtn.transform.Find("cnt-text-1")?.gameObject);
                     GameObject.Destroy(activeBtn.GetComponent<Image>());
 
-                    UIButton activeButton = activeBtn.GetComponent<UIButton>();
+                    btn.gameObject.name = "check-icon";
+                    prefab.activeButton = btn.GetComponent<UIButton>();
                     prefab.activeIcon = btn.GetComponent<Image>();
                     prefab.toggleOnSprite = UIRoot.instance.uiGame.mechaLab.toggleOnSprite;
                     prefab.toggleOffSprite = UIRoot.instance.uiGame.mechaLab.toggleOffSprite;
@@ -147,11 +150,19 @@ namespace TrafficSelection {
             return prefab;
         }
 
-        void Start() {
+        internal void Start() {
+            activeButton.onClick += OnActiveButtonClick;
+        }
+
+        private void OnActiveButtonClick(int obj) {
+            FilterValue value = FilterProcessor.Instance.GetValue(supply, demand);
+            value.allowed = !value.allowed;
+            FilterProcessor.Instance.SetValue(supply, demand, value);
+            RefreshValue();
         }
 
         public void SetUpValues() {
-            if (supplyType == ESupplyType.GasStub) {
+            if (remoteType == ERemoteType.GasStub) {
                 itemImage.sprite = UIFilterWindow.gasGiantSprite;
                 itemImage.color = new Color(0.5f, 0.5f, 0.5f, 0.6f);
             } else {
@@ -177,10 +188,21 @@ namespace TrafficSelection {
 
             if (station != null) {
                 stationText.text = station.GetName();
-            } else if (supplyType == ESupplyType.GasStub) {
+            } else if (remoteType == ERemoteType.GasStub) {
                 stationText.text = "Orbital Collection";
             } else {
                 stationText.text = "";
+            }
+
+            RefreshValue();
+         }
+
+        private void RefreshValue() {
+            FilterValue value = FilterProcessor.Instance.GetValue(supply, demand);
+            if (value.allowed) {
+                activeIcon.sprite = toggleOnSprite;
+            } else {
+                activeIcon.sprite = toggleOffSprite;
             }
         }
 

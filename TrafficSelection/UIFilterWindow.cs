@@ -12,15 +12,28 @@ namespace TrafficSelection {
     public class UIFilterWindow : ManualBehaviour, IPointerEnterHandler, IPointerExitHandler, IEventSystemHandler {
         public RectTransform windowTrans;
 
+        public StationComponent currentStation;
         public int itemId;
         public bool isPointEnter;
         private bool focusPointEnter;
 
         public UIListView remoteListView;
+        private ELogisticStorage remoteType;
 
         public void SetUpAndOpen(StationComponent station, int index) {
             UIRoot.instance.uiGame.ShutPlayerInventory();
             stationText.text = station.GetName();
+            if (station.storage[index].remoteLogic == ELogisticStorage.Demand) {
+                remoteType = ELogisticStorage.Supply;
+                supplyText.gameObject.SetActive(true);
+                demandText.gameObject.SetActive(false);
+            } else {
+                remoteType = ELogisticStorage.Demand;
+                supplyText.gameObject.SetActive(false);
+                demandText.gameObject.SetActive(true);
+            }
+
+            currentStation = station;
             itemId = station.storage[index].itemId;
             if (itemId <= 0) {
                 itemCircle.fillAmount = 0f;
@@ -80,15 +93,15 @@ namespace TrafficSelection {
         }
 
         public void SetUpData() {
-            _supplyList.Clear();
+            _remoteList.Clear();
             _gasList.Clear();
 
             remoteListView.Clear();
 
             SetUpItemList();
-            _supplyList.Sort((a, b) => a.distance - b.distance);
+            _remoteList.Sort((a, b) => a.distance - b.distance);
 
-            AddToListView(remoteListView, 10, _supplyList);
+            AddToListView(remoteListView, 20, _remoteList);
         }
 
         internal void SetUpItemList() {
@@ -102,13 +115,13 @@ namespace TrafficSelection {
                     StationComponent cmp = stationPool[i];
                     int length = cmp.storage.Length;
                     for (int j = 0; j < length; j++) {
-                        if (!cmp.isStellar || cmp.storage[j].itemId != itemId || cmp.storage[j].remoteLogic != ELogisticStorage.Supply) {
+                        if (!cmp.isStellar || cmp.storage[j].itemId != itemId || cmp.storage[j].remoteLogic != remoteType) {
                             continue;
                         }
 
                         if (cmp.isCollector) {
                             gasSupplyPlanets.Add(cmp.planetId);
-                            AddStore(cmp, j, cmp.planetId, ESupplyType.Gas);
+                            AddStore(cmp, j, cmp.planetId, ERemoteType.Gas);
                         } else {
                             AddStore(cmp, j, cmp.planetId);
                         }
@@ -118,37 +131,32 @@ namespace TrafficSelection {
             }
 
             foreach (var gasPlanetId in gasSupplyPlanets) {
-                AddStore(null, 0, gasPlanetId, ESupplyType.GasStub);
+                AddStore(null, 0, gasPlanetId, ERemoteType.GasStub);
             }
         }
 
-        internal List<SupplyData> _supplyList = new List<SupplyData>(200);
-        internal List<SupplyData> _gasList = new List<SupplyData>(800);
+        internal List<RemoteData> _remoteList = new List<RemoteData>(200);
+        internal List<RemoteData> _gasList = new List<RemoteData>(800);
 
-        internal void AddStore(StationComponent station, int index, int planetId, ESupplyType supplyType = ESupplyType.Normal) {
-            List<SupplyData> list;
-            int distance;
-
-            if (supplyType == ESupplyType.Gas) {
-                list = _gasList;
-                distance = 0;
-            } else {
-                list = _supplyList;
-                float distancef = StarDistance.GetStarDistanceFromHere(planetId / 100);
-                distance = (int) (distancef * 100);
+        internal void AddStore(StationComponent station, int index, int planetId, ERemoteType remoteType = ERemoteType.Normal) {
+            if (remoteType == ERemoteType.Gas) {
+                return;
             }
 
-            SupplyData d = new SupplyData() {
+            float distancef = StarDistance.GetStarDistanceFromHere(planetId / 100);
+            int distance = (int) (distancef * 100);
+
+            RemoteData d = new RemoteData() {
                 station = station,
                 index = index,
                 planetId = planetId,
                 distance = distance,
-                supplyType = supplyType,
+                remoteType = remoteType,
             };
-            list.Add(d);
+            _remoteList.Add(d);
         }
 
-        internal int AddToListView(UIListView listView, int count, List<SupplyData> list) {
+        internal int AddToListView(UIListView listView, int count, List<RemoteData> list) {
             if (list.Count < count) {
                 count = list.Count;
             }
@@ -157,15 +165,29 @@ namespace TrafficSelection {
             }
 
             for (int i = 0; i < count; i++) {
-                SupplyData d = list[0];
+                RemoteData d = list[0];
                 list.RemoveAt(0);
-                UISupplyListEntry e = listView.AddItem<UISupplyListEntry>();
+                UIRemoteListEntry e = listView.AddItem<UIRemoteListEntry>();
                 e.window = this;
                 e.station = d.station;
-                e.index = d.index;
                 e.itemId = itemId;
                 e.planetId = d.planetId;
-                e.supplyType = d.supplyType;
+                e.remoteType = d.remoteType;
+                if (remoteType == ELogisticStorage.Demand) {
+                    e.supply = FilterProcessor.GetIdentifier(currentStation, itemId);
+                    e.demand = new RemoteIdentifier {
+                        stationId = d.station == null ? -1 : d.station.gid,
+                        planetId = d.planetId,
+                        itemId = itemId,
+                    };
+                } else {
+                    e.demand = FilterProcessor.GetIdentifier(currentStation, itemId);
+                    e.supply = new RemoteIdentifier {
+                        stationId = d.station == null ? -1 : d.station.gid,
+                        planetId = d.planetId,
+                        itemId = itemId,
+                    };
+                }
                 e.SetUpValues();
             }
             return count;
@@ -176,6 +198,8 @@ namespace TrafficSelection {
         public Image itemImage;
         public Image itemCircle;
         public Text stationText;
+        public Text supplyText;
+        public Text demandText;
 
         public static Sprite defaultItemSprite = null;
         public static Sprite gasGiantSprite = null;
@@ -191,7 +215,7 @@ namespace TrafficSelection {
 
             remoteListView = go.GetComponent<UIListView>();
 
-            remoteListView.m_ItemRes.com_data = UISupplyListEntry.CreatePrefab();
+            remoteListView.m_ItemRes.com_data = UIRemoteListEntry.CreatePrefab();
             Transform parent = remoteListView.m_ItemRes.gameObject.transform;
             Transform transform = remoteListView.m_ItemRes.com_data.gameObject.transform;
 
@@ -262,6 +286,25 @@ namespace TrafficSelection {
                     go.SetActive(true);
                 }
             }
+
+            //demand supply label
+            Text stateText = assemblerWindow.stateText;
+
+            go = GameObject.Instantiate(stateText.gameObject);
+            go.name = "supply-label";
+            supplyText = go.GetComponent<Text>();
+            supplyText.text = "Supply".Translate();
+            supplyText.color = Util.DSPBlue;
+            rect = Util.NormalizeRectCenter(go);
+            rect.SetParent(windowTrans, false);
+            rect.sizeDelta = new Vector2(80, rect.sizeDelta.y);
+            rect.anchoredPosition = new Vector2(-185f, 168f);
+
+            go = GameObject.Instantiate(go, windowTrans);
+            go.name = "demand-label";
+            demandText = go.GetComponent<Text>();
+            demandText.text = "Demand".Translate();
+            demandText.color = Util.DSPOrange;
 
             //name
             Text titleText = gameObject.transform.Find("panel-bg/title-text")?.gameObject.GetComponent<Text>();
@@ -359,18 +402,18 @@ namespace TrafficSelection {
         }
     }
 
-    public enum ESupplyType {
+    public enum ERemoteType {
         Normal,
         Gas,
         GasStub,
     }
 
-    public struct SupplyData {
+    public struct RemoteData {
         public StationComponent station;
         public int index;
         public int planetId;
         public int itemId;
         public int distance;
-        public ESupplyType supplyType;
+        public ERemoteType remoteType;
     }
 }
