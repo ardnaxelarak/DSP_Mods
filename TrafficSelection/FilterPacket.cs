@@ -30,6 +30,10 @@ namespace TrafficSelection {
         public override void ProcessPacket(FilterPacket packet, INebulaConnection conn) {
             using IReaderProvider p = NebulaModAPI.GetBinaryReader(packet.Data);
             FilterProcessor.Instance.ReadSerialization(p.BinaryReader, packet.FullList);
+
+            if (IsHost) {
+                NebulaModAPI.MultiplayerSession.Network.SendPacket<FilterPacket>(packet);
+            }
         }
     }
 }
