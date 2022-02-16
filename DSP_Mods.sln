@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DequeCraft", "DequeCraft\De
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NoZoom", "NoZoom\NoZoom.csproj", "{DD2391D0-2CA5-4B0F-BDC9-7C58AFDF27F6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NoErrors", "NoErrors\NoErrors.csproj", "{8DEE5B66-53E6-4250-ADC0-FDF8882A5E12}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HideErrors", "HideErrors\HideErrors.csproj", "{8DEE5B66-53E6-4250-ADC0-FDF8882A5E12}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
