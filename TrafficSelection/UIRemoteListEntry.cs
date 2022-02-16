@@ -197,7 +197,7 @@ namespace TrafficSelection {
             RefreshValue();
          }
 
-        private void RefreshValue() {
+        public void RefreshValue() {
             FilterValue value = FilterProcessor.Instance.GetValue(supply, demand);
             if (value.allowed) {
                 activeIcon.sprite = toggleOnSprite;

@@ -1,15 +1,13 @@
-using BepInEx;
-using BepInEx.Logging;
-using HarmonyLib;
-using System;
-using System.Text;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using NebulaAPI;
 
 namespace TrafficSelection {
     public class UIFilterWindow : ManualBehaviour, IPointerEnterHandler, IPointerExitHandler, IEventSystemHandler {
+        public static UIFilterWindow instance;
+
         public RectTransform windowTrans;
 
         public StationComponent currentStation;
@@ -19,6 +17,10 @@ namespace TrafficSelection {
 
         public UIListView remoteListView;
         private ELogisticStorage remoteType;
+
+        internal void Awake() {
+            instance = this;
+        }
 
         public void SetUpAndOpen(StationComponent station, int index) {
             UIRoot.instance.uiGame.ShutPlayerInventory();
@@ -98,10 +100,18 @@ namespace TrafficSelection {
 
             remoteListView.Clear();
 
-            SetUpItemList();
-            _remoteList.Sort((a, b) => a.distance - b.distance);
+            if (NebulaModAPI.IsMultiplayerActive && NebulaModAPI.MultiplayerSession.LocalPlayer.IsClient) {
+                NebulaModAPI.MultiplayerSession.Network.SendPacket<FilterUIRequestPacket>(new FilterUIRequestPacket {
+                    StationId = currentStation.gid,
+                    ItemId = itemId,
+                    ShowSuppliers = remoteType == ELogisticStorage.Supply,
+                });
+            } else {
+                SetUpItemList();
+                _remoteList.Sort((a, b) => a.distance - b.distance);
 
-            AddToListView(remoteListView, 20, _remoteList);
+                AddToListView(remoteListView, 20, _remoteList);
+            }
         }
 
         internal void SetUpItemList() {
@@ -133,6 +143,36 @@ namespace TrafficSelection {
             foreach (var gasPlanetId in gasSupplyPlanets) {
                 AddStore(null, 0, gasPlanetId, ERemoteType.GasStub);
             }
+        }
+
+        public void SetUpItemList(FilterUIResponsePacket packet) {
+            GalacticTransport galacticTransport = GameMain.data.galacticTransport;
+            StationComponent[] stationPool = galacticTransport.stationPool;
+
+            foreach (int stationId in packet.StationIds) {
+                if (stationPool[stationId] != null) {
+                    StationComponent cmp = stationPool[stationId];
+                    int length = cmp.storage.Length;
+                    for (int j = 0; j < length; j++) {
+                        if (!cmp.isStellar || cmp.storage[j].itemId != itemId || cmp.storage[j].remoteLogic != remoteType) {
+                            continue;
+                        }
+
+                        if (!cmp.isCollector) {
+                            AddStore(cmp, j, cmp.planetId);
+                        }
+                        break;
+                    }
+                }
+            }
+
+            foreach (int gasPlanetId in packet.GasPlanetIds) {
+                AddStore(null, 0, gasPlanetId, ERemoteType.GasStub);
+            }
+
+            _remoteList.Sort((a, b) => a.distance - b.distance);
+
+            AddToListView(remoteListView, 20, _remoteList);
         }
 
         internal List<RemoteData> _remoteList = new List<RemoteData>(200);
@@ -203,6 +243,12 @@ namespace TrafficSelection {
 
         public static Sprite defaultItemSprite = null;
         public static Sprite gasGiantSprite = null;
+
+        public void RefreshValues() {
+            for (int i = 0; i < remoteListView.ItemCount; i++) {
+                remoteListView.GetItem<UIRemoteListEntry>(i).RefreshValue();
+            }
+        }
 
         internal void CreateListViews() {
             UIListView src = UIRoot.instance.uiGame.tutorialWindow.entryList;

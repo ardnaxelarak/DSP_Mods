@@ -31,6 +31,8 @@ namespace TrafficSelection {
             using IReaderProvider p = NebulaModAPI.GetBinaryReader(packet.Data);
             FilterProcessor.Instance.ReadSerialization(p.BinaryReader, packet.FullList);
 
+            UIFilterWindow.instance.RefreshValues();
+
             if (IsHost) {
                 NebulaModAPI.MultiplayerSession.Network.SendPacket<FilterPacket>(packet);
             }

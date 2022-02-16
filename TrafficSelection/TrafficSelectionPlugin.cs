@@ -4,7 +4,6 @@ using HarmonyLib;
 using NebulaAPI;
 using System.IO;
 using System.Reflection;
-using UnityEngine;
 
 namespace TrafficSelection {
     [BepInPlugin(PluginGuid, PluginName, PluginVersion)]

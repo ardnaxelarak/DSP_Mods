@@ -90,6 +90,7 @@
     <Compile Include="Extensions.cs" />
     <Compile Include="FilterPacket.cs" />
     <Compile Include="FilterProcessor.cs" />
+    <Compile Include="FilterUIPacket.cs" />
     <Compile Include="StarDistance.cs" />
     <Compile Include="UIFilterWindow.cs" />
     <Compile Include="UIStationStorageParasite.cs" />
