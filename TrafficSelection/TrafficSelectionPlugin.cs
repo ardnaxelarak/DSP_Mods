@@ -4,6 +4,7 @@ using HarmonyLib;
 using NebulaAPI;
 using System.IO;
 using System.Reflection;
+using UnityEngine;
 
 namespace TrafficSelection {
     [BepInPlugin(PluginGuid, PluginName, PluginVersion)]
@@ -113,7 +114,10 @@ namespace TrafficSelection {
         }
 
         public void IntoOtherSave() {
-            FilterProcessor.Instance.Clear();
+            Debug.Log("IntoOtherSave called");
+            if (!NebulaModAPI.IsMultiplayerActive || NebulaModAPI.MultiplayerSession.LocalPlayer.IsHost) {
+                FilterProcessor.Instance.Clear();
+            }
         }
 
         public bool CheckVersion(string hostVersion, string clientVersion) {

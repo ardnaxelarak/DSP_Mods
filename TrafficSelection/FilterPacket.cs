@@ -1,4 +1,5 @@
 ﻿using NebulaAPI;
+using UnityEngine;
 
 namespace TrafficSelection {
     public class FilterPacket {
@@ -19,6 +20,7 @@ namespace TrafficSelection {
             FullList = false;
 
             using IWriterProvider p = NebulaModAPI.GetBinaryWriter();
+            p.BinaryWriter.Write(1);
             pair.Write(p.BinaryWriter);
             value.Write(p.BinaryWriter);
             Data = p.CloseAndGetBytes();
@@ -28,6 +30,7 @@ namespace TrafficSelection {
     [RegisterPacketProcessor]
     public class FilterPacketProcessor : BasePacketProcessor<FilterPacket> {
         public override void ProcessPacket(FilterPacket packet, INebulaConnection conn) {
+            Debug.Log("Recieved FilterPacket");
             using IReaderProvider p = NebulaModAPI.GetBinaryReader(packet.Data);
             FilterProcessor.Instance.ReadSerialization(p.BinaryReader, packet.FullList);
 

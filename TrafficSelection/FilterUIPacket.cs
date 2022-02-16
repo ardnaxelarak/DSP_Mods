@@ -1,5 +1,6 @@
 ﻿using NebulaAPI;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace TrafficSelection {
     public class FilterUIRequestPacket {
@@ -16,6 +17,8 @@ namespace TrafficSelection {
     [RegisterPacketProcessor]
     public class FilterUIRequestPacketProcessor : BasePacketProcessor<FilterUIRequestPacket> {
         public override void ProcessPacket(FilterUIRequestPacket packet, INebulaConnection conn) {
+            Debug.Log("Recieved FilterUIRequestPacket");
+
             HashSet<int> gasSupplyPlanets = new HashSet<int>();
             List<int> remoteStations = new List<int>();
 
@@ -60,6 +63,11 @@ namespace TrafficSelection {
     [RegisterPacketProcessor]
     public class FilterUIResponsePacketProcessor : BasePacketProcessor<FilterUIResponsePacket> {
         public override void ProcessPacket(FilterUIResponsePacket packet, INebulaConnection conn) {
+            Debug.Log("Recieved FilterUIResponsePacket");
+            foreach (int stationId in packet.StationIds) {
+                Debug.Log(stationId);
+            }
+
             UIFilterWindow.instance.SetUpItemList(packet);
         }
     }

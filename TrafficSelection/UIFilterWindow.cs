@@ -1,8 +1,8 @@
+using NebulaAPI;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.EventSystems;
-using NebulaAPI;
+using UnityEngine.UI;
 
 namespace TrafficSelection {
     public class UIFilterWindow : ManualBehaviour, IPointerEnterHandler, IPointerExitHandler, IEventSystemHandler {
@@ -131,9 +131,9 @@ namespace TrafficSelection {
 
                         if (cmp.isCollector) {
                             gasSupplyPlanets.Add(cmp.planetId);
-                            AddStore(cmp, j, cmp.planetId, ERemoteType.Gas);
+                            AddStore(cmp, cmp.planetId, ERemoteType.Gas);
                         } else {
-                            AddStore(cmp, j, cmp.planetId);
+                            AddStore(cmp, cmp.planetId);
                         }
                         break;
                     }
@@ -141,7 +141,7 @@ namespace TrafficSelection {
             }
 
             foreach (var gasPlanetId in gasSupplyPlanets) {
-                AddStore(null, 0, gasPlanetId, ERemoteType.GasStub);
+                AddStore(null, gasPlanetId, ERemoteType.GasStub);
             }
         }
 
@@ -152,22 +152,14 @@ namespace TrafficSelection {
             foreach (int stationId in packet.StationIds) {
                 if (stationPool[stationId] != null) {
                     StationComponent cmp = stationPool[stationId];
-                    int length = cmp.storage.Length;
-                    for (int j = 0; j < length; j++) {
-                        if (!cmp.isStellar || cmp.storage[j].itemId != itemId || cmp.storage[j].remoteLogic != remoteType) {
-                            continue;
-                        }
-
-                        if (!cmp.isCollector) {
-                            AddStore(cmp, j, cmp.planetId);
-                        }
-                        break;
+                    if (!cmp.isCollector) {
+                        AddStore(cmp, cmp.planetId);
                     }
                 }
             }
 
             foreach (int gasPlanetId in packet.GasPlanetIds) {
-                AddStore(null, 0, gasPlanetId, ERemoteType.GasStub);
+                AddStore(null, gasPlanetId, ERemoteType.GasStub);
             }
 
             _remoteList.Sort((a, b) => a.distance - b.distance);
@@ -178,7 +170,7 @@ namespace TrafficSelection {
         internal List<RemoteData> _remoteList = new List<RemoteData>(200);
         internal List<RemoteData> _gasList = new List<RemoteData>(800);
 
-        internal void AddStore(StationComponent station, int index, int planetId, ERemoteType remoteType = ERemoteType.Normal) {
+        internal void AddStore(StationComponent station, int planetId, ERemoteType remoteType = ERemoteType.Normal) {
             if (remoteType == ERemoteType.Gas) {
                 return;
             }
@@ -188,7 +180,6 @@ namespace TrafficSelection {
 
             RemoteData d = new RemoteData() {
                 station = station,
-                index = index,
                 planetId = planetId,
                 distance = distance,
                 remoteType = remoteType,
@@ -414,6 +405,7 @@ namespace TrafficSelection {
         public void Close() {
             base._Close();
             gameObject.SetActive(false);
+            this.isPointEnter = false;
         }
 
         public static UIFilterWindow CreateWindow(string name, string title = "") {
@@ -456,7 +448,6 @@ namespace TrafficSelection {
 
     public struct RemoteData {
         public StationComponent station;
-        public int index;
         public int planetId;
         public int itemId;
         public int distance;

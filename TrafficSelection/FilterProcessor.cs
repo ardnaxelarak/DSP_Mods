@@ -165,6 +165,7 @@ namespace TrafficSelection {
                 FilterValue value = FilterValue.Read(reader);
                 filters[pair] = value;
             }
+            Debug.Log("Read " + count + " filter rules");
             UpdateAllStations();
         }
 
