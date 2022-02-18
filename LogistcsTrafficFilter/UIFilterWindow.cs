@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace TrafficSelection {
+namespace LogisticsTrafficFilter {
     public class UIFilterWindow : ManualBehaviour, IPointerEnterHandler, IPointerExitHandler, IEventSystemHandler {
         public static UIFilterWindow instance;
 
@@ -101,7 +101,7 @@ namespace TrafficSelection {
             remoteListView.Clear();
 
             if (NebulaModAPI.IsMultiplayerActive && NebulaModAPI.MultiplayerSession.LocalPlayer.IsClient) {
-                NebulaModAPI.MultiplayerSession.Network.SendPacket<FilterUIRequestPacket>(new FilterUIRequestPacket {
+                NebulaModAPI.MultiplayerSession.Network.SendPacket<UIFilterRequestPacket>(new UIFilterRequestPacket {
                     StationId = currentStation.gid,
                     ItemId = itemId,
                     ShowSuppliers = remoteType == ELogisticStorage.Supply,
@@ -131,7 +131,7 @@ namespace TrafficSelection {
 
                         if (cmp.isCollector) {
                             gasSupplyPlanets.Add(cmp.planetId);
-                            AddStore(cmp, cmp.planetId, ERemoteType.Gas);
+                            AddStore(cmp, cmp.planetId, EStationType.Gas);
                         } else {
                             AddStore(cmp, cmp.planetId);
                         }
@@ -141,11 +141,11 @@ namespace TrafficSelection {
             }
 
             foreach (var gasPlanetId in gasSupplyPlanets) {
-                AddStore(null, gasPlanetId, ERemoteType.GasStub);
+                AddStore(null, gasPlanetId, EStationType.GasStub);
             }
         }
 
-        public void SetUpItemList(FilterUIResponsePacket packet) {
+        public void SetUpItemList(UIFilterResponsePacket packet) {
             GalacticTransport galacticTransport = GameMain.data.galacticTransport;
             StationComponent[] stationPool = galacticTransport.stationPool;
 
@@ -159,7 +159,7 @@ namespace TrafficSelection {
             }
 
             foreach (int gasPlanetId in packet.GasPlanetIds) {
-                AddStore(null, gasPlanetId, ERemoteType.GasStub);
+                AddStore(null, gasPlanetId, EStationType.GasStub);
             }
 
             _remoteList.Sort((a, b) => a.distance - b.distance);
@@ -167,27 +167,27 @@ namespace TrafficSelection {
             AddToListView(remoteListView, 20, _remoteList);
         }
 
-        internal List<RemoteData> _remoteList = new List<RemoteData>(200);
-        internal List<RemoteData> _gasList = new List<RemoteData>(800);
+        internal List<StationData> _remoteList = new List<StationData>(200);
+        internal List<StationData> _gasList = new List<StationData>(800);
 
-        internal void AddStore(StationComponent station, int planetId, ERemoteType remoteType = ERemoteType.Normal) {
-            if (remoteType == ERemoteType.Gas) {
+        internal void AddStore(StationComponent station, int planetId, EStationType stationType = EStationType.Normal) {
+            if (stationType == EStationType.Gas) {
                 return;
             }
 
             float distancef = StarDistance.GetStarDistanceFromHere(planetId / 100);
             int distance = (int) (distancef * 100);
 
-            RemoteData d = new RemoteData() {
+            StationData d = new StationData() {
                 station = station,
                 planetId = planetId,
                 distance = distance,
-                remoteType = remoteType,
+                stationType = stationType,
             };
             _remoteList.Add(d);
         }
 
-        internal int AddToListView(UIListView listView, int count, List<RemoteData> list) {
+        internal int AddToListView(UIListView listView, int count, List<StationData> list) {
             if (list.Count < count) {
                 count = list.Count;
             }
@@ -196,24 +196,24 @@ namespace TrafficSelection {
             }
 
             for (int i = 0; i < count; i++) {
-                RemoteData d = list[0];
+                StationData d = list[0];
                 list.RemoveAt(0);
                 UIRemoteListEntry e = listView.AddItem<UIRemoteListEntry>();
                 e.window = this;
                 e.station = d.station;
                 e.itemId = itemId;
                 e.planetId = d.planetId;
-                e.remoteType = d.remoteType;
+                e.remoteType = d.stationType;
                 if (remoteType == ELogisticStorage.Demand) {
                     e.supply = FilterProcessor.GetIdentifier(currentStation, itemId);
-                    e.demand = new RemoteIdentifier {
+                    e.demand = new StationIdentifier {
                         stationId = d.station == null ? -1 : d.station.gid,
                         planetId = d.planetId,
                         itemId = itemId,
                     };
                 } else {
                     e.demand = FilterProcessor.GetIdentifier(currentStation, itemId);
-                    e.supply = new RemoteIdentifier {
+                    e.supply = new StationIdentifier {
                         stationId = d.station == null ? -1 : d.station.gid,
                         planetId = d.planetId,
                         itemId = itemId,
@@ -440,17 +440,17 @@ namespace TrafficSelection {
         }
     }
 
-    public enum ERemoteType {
+    public enum EStationType {
         Normal,
         Gas,
         GasStub,
     }
 
-    public struct RemoteData {
+    public struct StationData {
         public StationComponent station;
         public int planetId;
         public int itemId;
         public int distance;
-        public ERemoteType remoteType;
+        public EStationType stationType;
     }
 }

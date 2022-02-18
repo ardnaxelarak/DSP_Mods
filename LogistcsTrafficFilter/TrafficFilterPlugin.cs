@@ -6,15 +6,15 @@ using System.IO;
 using System.Reflection;
 using UnityEngine;
 
-namespace TrafficSelection {
+namespace LogisticsTrafficFilter {
     [BepInPlugin(PluginGuid, PluginName, PluginVersion)]
     [BepInProcess("DSPGAME.exe")]
     [BepInDependency(DSPModSavePlugin.MODGUID)]
     [BepInDependency(NebulaModAPI.API_GUID)]
-    public class TrafficSelectionPlugin : BaseUnityPlugin, IModCanSave, IMultiplayerModWithSettings {
-        private const string PluginGuid = "com.ardnaxelarak.dsp.TrafficSelection";
-        private const string PluginName = "TrafficSelection";
-        private const string PluginVersion = "0.0.1";
+    public class TrafficFilterPlugin : BaseUnityPlugin, IModCanSave, IMultiplayerModWithSettings {
+        private const string PluginGuid = "com.ardnaxelarak.dsp.LogisticsTrafficFilter";
+        private const string PluginName = "LogisticsTrafficFilter";
+        private const string PluginVersion = "1.0.0";
 
         internal static bool _initialized = false;
         public static UIFilterWindow _win;
@@ -23,7 +23,7 @@ namespace TrafficSelection {
 
         internal void Awake() {
             new Harmony(PluginGuid);
-            Harmony.CreateAndPatchAll(typeof(TrafficSelectionPlugin));
+            Harmony.CreateAndPatchAll(typeof(TrafficFilterPlugin));
             Harmony.CreateAndPatchAll(typeof(StarDistance.Patch));
             NebulaModAPI.RegisterPackets(Assembly.GetExecutingAssembly());
         }
@@ -43,7 +43,7 @@ namespace TrafficSelection {
         public static void UIGame__OnCreate_Postfix() {
             if (!_initialized) {
                 _initialized = true;
-                _win = UIFilterWindow.CreateWindow("TrafficSelector", "Remote Filtering");
+                _win = UIFilterWindow.CreateWindow("LogisticsTrafficFilter", "Traffic Filtering");
 
                 AddButtonToStationWindow();
             }
@@ -79,8 +79,8 @@ namespace TrafficSelection {
             StationComponent supply = galacticTransport.stationPool[sId];
             StationComponent demand = galacticTransport.stationPool[dId];
 
-            RemoteIdentifier supplyIdent = FilterProcessor.GetIdentifier(supply, supply.storage[sIdx].itemId);
-            RemoteIdentifier demandIdent = FilterProcessor.GetIdentifier(demand, demand.storage[dIdx].itemId);
+            StationIdentifier supplyIdent = FilterProcessor.GetIdentifier(supply, supply.storage[sIdx].itemId);
+            StationIdentifier demandIdent = FilterProcessor.GetIdentifier(demand, demand.storage[dIdx].itemId);
 
             return FilterProcessor.Instance.GetValue(supplyIdent, demandIdent).allowed;
         }
@@ -106,15 +106,32 @@ namespace TrafficSelection {
         }
 
         public void Export(BinaryWriter w) {
+            w.Write('L');
+            w.Write('T');
+            w.Write('F');
+            w.Write(FilterProcessor.saveVersion);
             FilterProcessor.Instance.WriteSerialization(w);
         }
 
         public void Import(BinaryReader r) {
-            FilterProcessor.Instance.ReadSerialization(r);
+            try {
+                bool flag = true;
+                flag &= r.ReadChar() == 'L';
+                flag &= r.ReadChar() == 'T';
+                flag &= r.ReadChar() == 'F';
+                if (flag) {
+                    int saveVersion = r.ReadInt32();
+                    FilterProcessor.Instance.ReadSerialization(r, saveVersion);
+                } else {
+                    FilterProcessor.Instance.Clear();
+                }
+            } catch (IOException) {
+                Debug.Log("Error reading LogisticsTrafficFilter save file");
+                FilterProcessor.Instance.Clear();
+            }
         }
 
         public void IntoOtherSave() {
-            Debug.Log("IntoOtherSave called");
             if (!NebulaModAPI.IsMultiplayerActive || NebulaModAPI.MultiplayerSession.LocalPlayer.IsHost) {
                 FilterProcessor.Instance.Clear();
             }

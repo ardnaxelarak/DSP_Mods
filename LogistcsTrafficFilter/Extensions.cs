@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TrafficSelection {
+namespace LogisticsTrafficFilter {
     public static class Extensions {
         public static string GetName(this StationComponent station) {
             if (!string.IsNullOrEmpty(station.name)) {

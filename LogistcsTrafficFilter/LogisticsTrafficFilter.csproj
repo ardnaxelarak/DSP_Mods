@@ -7,8 +7,8 @@
     <ProjectGuid>{9835E2EC-26B8-4811-87CD-18554025B6AD}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>TrafficSelection</RootNamespace>
-    <AssemblyName>TrafficSelection</AssemblyName>
+    <RootNamespace>LogisticsTrafficFilter</RootNamespace>
+    <AssemblyName>LogisticsTrafficFilter</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <LangVersion>8.0</LangVersion>
     <FileAlignment>512</FileAlignment>
@@ -90,17 +90,14 @@
     <Compile Include="Extensions.cs" />
     <Compile Include="FilterPacket.cs" />
     <Compile Include="FilterProcessor.cs" />
-    <Compile Include="FilterUIPacket.cs" />
+    <Compile Include="UIFilterPacket.cs" />
     <Compile Include="StarDistance.cs" />
     <Compile Include="UIFilterWindow.cs" />
     <Compile Include="UIStationStorageParasite.cs" />
     <Compile Include="UIRemoteListEntry.cs" />
     <Compile Include="Util.cs" />
-    <Compile Include="TrafficSelectionPlugin.cs" />
+    <Compile Include="TrafficFilterPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

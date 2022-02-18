@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
-namespace TrafficSelection {
+namespace LogisticsTrafficFilter {
     [Serializable]
-    public struct RemoteIdentifier {
+    public struct StationIdentifier {
         public int stationId;
         public int planetId;
         public int itemId;
@@ -14,8 +14,8 @@ namespace TrafficSelection {
 
     [Serializable]
     public struct FilterPair {
-        public RemoteIdentifier supply;
-        public RemoteIdentifier demand;
+        public StationIdentifier supply;
+        public StationIdentifier demand;
 
         public string ToDebugString() {
             return "<" + supply.stationId + " " + supply.planetId + " " + supply.itemId + " -> " + demand.stationId + " " + demand.planetId + " " + demand.itemId + ">";
@@ -32,12 +32,12 @@ namespace TrafficSelection {
 
         public static FilterPair Read(BinaryReader reader) {
             return new FilterPair {
-                supply = new RemoteIdentifier {
+                supply = new StationIdentifier {
                     stationId = reader.ReadInt32(),
                     planetId = reader.ReadInt32(),
                     itemId = reader.ReadInt32(),
                 },
-                demand = new RemoteIdentifier {
+                demand = new StationIdentifier {
                     stationId = reader.ReadInt32(),
                     planetId = reader.ReadInt32(),
                     itemId = reader.ReadInt32(),
@@ -60,6 +60,8 @@ namespace TrafficSelection {
     }
 
     public class FilterProcessor {
+        public const int saveVersion = 1;
+
         private static FilterProcessor _instance;
 
         private readonly Dictionary<FilterPair, FilterValue> filters;
@@ -75,7 +77,7 @@ namespace TrafficSelection {
             return filters[pair];
         }
 
-        public FilterValue GetValue(RemoteIdentifier supply, RemoteIdentifier demand) {
+        public FilterValue GetValue(StationIdentifier supply, StationIdentifier demand) {
             FilterPair pair = new FilterPair {
                 supply = supply,
                 demand = demand,
@@ -91,8 +93,8 @@ namespace TrafficSelection {
             return GetValue(pair);
         }
 
-        public static RemoteIdentifier GetIdentifier(StationComponent station, int itemId) {
-            return new RemoteIdentifier {
+        public static StationIdentifier GetIdentifier(StationComponent station, int itemId) {
+            return new StationIdentifier {
                 stationId = station.isCollector ? -1 : station.gid,
                 planetId = station.planetId,
                 itemId = itemId,
@@ -139,7 +141,7 @@ namespace TrafficSelection {
             UpdateStations(pair);
         }
 
-        public void SetValue(RemoteIdentifier supply, RemoteIdentifier demand, FilterValue value) {
+        public void SetValue(StationIdentifier supply, StationIdentifier demand, FilterValue value) {
             FilterPair pair = new FilterPair {
                 supply = supply,
                 demand = demand,
@@ -155,7 +157,7 @@ namespace TrafficSelection {
             }
         }
 
-        public void ReadSerialization(BinaryReader reader, bool fullList = true) {
+        public void ReadSerialization(BinaryReader reader, int saveVersion = saveVersion, bool fullList = true) {
             if (fullList) {
                 filters.Clear();
             }
@@ -165,7 +167,6 @@ namespace TrafficSelection {
                 FilterValue value = FilterValue.Read(reader);
                 filters[pair] = value;
             }
-            Debug.Log("Read " + count + " filter rules");
             UpdateAllStations();
         }
 

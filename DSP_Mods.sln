@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31515.178
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrafficSelection", "TrafficSelection\TrafficSelection.csproj", "{9835E2EC-26B8-4811-87CD-18554025B6AD}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DequeCraft", "DequeCraft\DequeCraft.csproj", "{60319871-5251-4801-9AD5-0ABC8D389613}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NoZoom", "NoZoom\NoZoom.csproj", "{DD2391D0-2CA5-4B0F-BDC9-7C58AFDF27F6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HideErrors", "HideErrors\HideErrors.csproj", "{8DEE5B66-53E6-4250-ADC0-FDF8882A5E12}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogisticsTrafficFilter", "LogistcsTrafficFilter\LogisticsTrafficFilter.csproj", "{9835E2EC-26B8-4811-87CD-18554025B6AD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +17,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{9835E2EC-26B8-4811-87CD-18554025B6AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9835E2EC-26B8-4811-87CD-18554025B6AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9835E2EC-26B8-4811-87CD-18554025B6AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9835E2EC-26B8-4811-87CD-18554025B6AD}.Release|Any CPU.Build.0 = Release|Any CPU
 		{60319871-5251-4801-9AD5-0ABC8D389613}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{60319871-5251-4801-9AD5-0ABC8D389613}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{60319871-5251-4801-9AD5-0ABC8D389613}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -33,6 +29,10 @@ Global
 		{8DEE5B66-53E6-4250-ADC0-FDF8882A5E12}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8DEE5B66-53E6-4250-ADC0-FDF8882A5E12}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8DEE5B66-53E6-4250-ADC0-FDF8882A5E12}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9835E2EC-26B8-4811-87CD-18554025B6AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9835E2EC-26B8-4811-87CD-18554025B6AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9835E2EC-26B8-4811-87CD-18554025B6AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9835E2EC-26B8-4811-87CD-18554025B6AD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

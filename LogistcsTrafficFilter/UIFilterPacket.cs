@@ -2,23 +2,21 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace TrafficSelection {
-    public class FilterUIRequestPacket {
+namespace LogisticsTrafficFilter {
+    public class UIFilterRequestPacket {
         public int StationId { get; set; }
         public int ItemId { get; set; }
         public bool ShowSuppliers { get; set; }
     }
 
-    public class FilterUIResponsePacket {
+    public class UIFilterResponsePacket {
         public int[] StationIds { get; set; }
         public int[] GasPlanetIds { get; set; }
     }
 
     [RegisterPacketProcessor]
-    public class FilterUIRequestPacketProcessor : BasePacketProcessor<FilterUIRequestPacket> {
-        public override void ProcessPacket(FilterUIRequestPacket packet, INebulaConnection conn) {
-            Debug.Log("Recieved FilterUIRequestPacket");
-
+    public class UIFilterRequestPacketProcessor : BasePacketProcessor<UIFilterRequestPacket> {
+        public override void ProcessPacket(UIFilterRequestPacket packet, INebulaConnection conn) {
             HashSet<int> gasSupplyPlanets = new HashSet<int>();
             List<int> remoteStations = new List<int>();
 
@@ -51,23 +49,18 @@ namespace TrafficSelection {
                 gasList.Add(planetId);
             }
 
-            FilterUIResponsePacket response = new FilterUIResponsePacket {
+            UIFilterResponsePacket response = new UIFilterResponsePacket {
                 StationIds = remoteStations.ToArray(),
                 GasPlanetIds = gasList.ToArray(),
             };
 
-            conn.SendPacket<FilterUIResponsePacket>(response);
+            conn.SendPacket<UIFilterResponsePacket>(response);
         }
     }
 
     [RegisterPacketProcessor]
-    public class FilterUIResponsePacketProcessor : BasePacketProcessor<FilterUIResponsePacket> {
-        public override void ProcessPacket(FilterUIResponsePacket packet, INebulaConnection conn) {
-            Debug.Log("Recieved FilterUIResponsePacket");
-            foreach (int stationId in packet.StationIds) {
-                Debug.Log(stationId);
-            }
-
+    public class UIFilterResponsePacketProcessor : BasePacketProcessor<UIFilterResponsePacket> {
+        public override void ProcessPacket(UIFilterResponsePacket packet, INebulaConnection conn) {
             UIFilterWindow.instance.SetUpItemList(packet);
         }
     }

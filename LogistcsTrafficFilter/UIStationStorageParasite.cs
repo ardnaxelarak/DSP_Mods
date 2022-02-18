@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-namespace TrafficSelection {
+namespace LogisticsTrafficFilter {
     public class UIStationStorageParasite : MonoBehaviour {
         public static UIFilterWindow win;
 

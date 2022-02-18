@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using HarmonyLib;
 
-namespace TrafficSelection {
+namespace LogisticsTrafficFilter {
     public class StarDistance {
         public static class Patch {
             [HarmonyPrefix, HarmonyPatch(typeof(GameMain), "Begin")]

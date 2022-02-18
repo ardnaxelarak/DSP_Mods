@@ -6,10 +6,10 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-namespace TrafficSelection {
+namespace LogisticsTrafficFilter {
     public class UIRemoteListEntry : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler {
-        public RemoteIdentifier supply;
-        public RemoteIdentifier demand;
+        public StationIdentifier supply;
+        public StationIdentifier demand;
         public StationComponent station;
 
         public int itemId;
@@ -19,7 +19,7 @@ namespace TrafficSelection {
 
         public int stationMaxItemCount = 0;
 
-        public ERemoteType remoteType;
+        public EStationType remoteType;
 
         [SerializeField]
         public Image itemImage;
@@ -162,7 +162,7 @@ namespace TrafficSelection {
         }
 
         public void SetUpValues() {
-            if (remoteType == ERemoteType.GasStub) {
+            if (remoteType == EStationType.GasStub) {
                 itemImage.sprite = UIFilterWindow.gasGiantSprite;
                 itemImage.color = new Color(0.5f, 0.5f, 0.5f, 0.6f);
             } else {
@@ -188,7 +188,7 @@ namespace TrafficSelection {
 
             if (station != null) {
                 stationText.text = station.GetName();
-            } else if (remoteType == ERemoteType.GasStub) {
+            } else if (remoteType == EStationType.GasStub) {
                 stationText.text = "Orbital Collection";
             } else {
                 stationText.text = "";

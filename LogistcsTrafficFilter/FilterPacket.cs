@@ -1,7 +1,7 @@
 ﻿using NebulaAPI;
 using UnityEngine;
 
-namespace TrafficSelection {
+namespace LogisticsTrafficFilter {
     public class FilterPacket {
         public bool FullList { get; set; }
         public byte[] Data { get; set; }
@@ -32,7 +32,7 @@ namespace TrafficSelection {
         public override void ProcessPacket(FilterPacket packet, INebulaConnection conn) {
             Debug.Log("Recieved FilterPacket");
             using IReaderProvider p = NebulaModAPI.GetBinaryReader(packet.Data);
-            FilterProcessor.Instance.ReadSerialization(p.BinaryReader, packet.FullList);
+            FilterProcessor.Instance.ReadSerialization(p.BinaryReader, FilterProcessor.saveVersion, packet.FullList);
 
             UIFilterWindow.instance.RefreshValues();
 
