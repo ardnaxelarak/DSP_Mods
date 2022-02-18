@@ -7,8 +7,8 @@
     <ProjectGuid>{8DEE5B66-53E6-4250-ADC0-FDF8882A5E12}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>NoErrors</RootNamespace>
-    <AssemblyName>NoErrors</AssemblyName>
+    <RootNamespace>HideErrors</RootNamespace>
+    <AssemblyName>HideErrors</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
