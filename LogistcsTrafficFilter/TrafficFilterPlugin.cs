@@ -82,7 +82,20 @@ namespace LogisticsTrafficFilter {
             StationIdentifier supplyIdent = FilterProcessor.GetIdentifier(supply, supply.storage[sIdx].itemId);
             StationIdentifier demandIdent = FilterProcessor.GetIdentifier(demand, demand.storage[dIdx].itemId);
 
-            return FilterProcessor.Instance.GetValue(supplyIdent, demandIdent).allowed;
+            FilterValue value = FilterProcessor.Instance.GetValue(supplyIdent, demandIdent);
+            if (true) {
+                FilterPair pair = new FilterPair() {
+                    supply = supplyIdent,
+                    demand = demandIdent,
+                };
+                Debug.Log("AddRemotePair: " + pair.ToDebugString() + ": " + value.allowed);
+            }
+            return value.allowed;
+        }
+
+        [HarmonyPrefix, HarmonyPatch(typeof(StationComponent), "RematchRemotePairs")]
+        public static void StationComponent_RematchRemotePairs_Prefix(StationComponent __instance, int keyStationGId) {
+            Debug.Log("RematchRemotePairs: " + __instance.gid + " " + keyStationGId);
         }
 
         [HarmonyPostfix, HarmonyPatch(typeof(UIGame), "ShutAllFunctionWindow")]
