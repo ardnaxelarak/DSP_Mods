@@ -82,7 +82,8 @@ namespace LogisticsTrafficFilter {
             StationIdentifier supplyIdent = FilterProcessor.GetIdentifier(supply, supply.storage[sIdx].itemId);
             StationIdentifier demandIdent = FilterProcessor.GetIdentifier(demand, demand.storage[dIdx].itemId);
 
-            return FilterProcessor.Instance.GetValue(supplyIdent, demandIdent).allowed;
+            FilterValue value = FilterProcessor.Instance.GetValue(supplyIdent, demandIdent);
+            return value.allowed;
         }
 
         [HarmonyPostfix, HarmonyPatch(typeof(UIGame), "ShutAllFunctionWindow")]

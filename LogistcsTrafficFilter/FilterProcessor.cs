@@ -108,11 +108,27 @@ namespace LogisticsTrafficFilter {
             }
             GalacticTransport galacticTransport = gameData.galacticTransport;
             int shipCarries = gameData.history.logisticShipCarries;
+            int cursor = galacticTransport.stationCursor;
 
-            if (pair.demand.stationId > 0) {
-                StationComponent station = galacticTransport.stationPool[pair.demand.stationId];
-                station.ClearRemotePairs();
-                station.RematchRemotePairs(galacticTransport.stationPool, galacticTransport.stationCursor, pair.supply.stationId > 0 ? pair.supply.stationId : 0, shipCarries);
+            HashSet<int> toUpdate = new HashSet<int>();
+
+            for (int i = 1; i < cursor; i++) {
+                StationComponent station = galacticTransport.stationPool[i];
+                if (station == null) {
+                    continue;
+                }
+                if ((station.isCollector && station.planetId == pair.supply.planetId) || pair.supply.stationId == i || pair.demand.stationId == i) {
+                    toUpdate.Add(i);
+                }
+            }
+
+            foreach (int gid in toUpdate) {
+                galacticTransport.stationPool[gid].ClearRemotePairs();
+            }
+
+            foreach (int gid in toUpdate) {
+                StationComponent station = galacticTransport.stationPool[gid];
+                station.RematchRemotePairs(galacticTransport.stationPool, cursor, 0, shipCarries);
             }
         }
 
@@ -123,13 +139,15 @@ namespace LogisticsTrafficFilter {
             }
             GalacticTransport galacticTransport = gameData.galacticTransport;
             int shipCarries = gameData.history.logisticShipCarries;
-
             int cursor = galacticTransport.stationCursor;
 
             for (int i = 1; i < cursor; i++) {
+                galacticTransport.stationPool[i].ClearRemotePairs();
+            }
+
+            for (int i = 1; i < cursor; i++) {
                 StationComponent station = galacticTransport.stationPool[i];
-                station.ClearRemotePairs();
-                station.RematchRemotePairs(galacticTransport.stationPool, galacticTransport.stationCursor, 0, shipCarries);
+                station.RematchRemotePairs(galacticTransport.stationPool, cursor, 0, shipCarries);
             }
         }
 
