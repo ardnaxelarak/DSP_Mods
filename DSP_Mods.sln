@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HideErrors", "HideErrors\Hi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogisticsTrafficFilter", "LogistcsTrafficFilter\LogisticsTrafficFilter.csproj", "{9835E2EC-26B8-4811-87CD-18554025B6AD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlanetLoader", "PlanetLoader\PlanetLoader.csproj", "{C699343E-AB41-4C07-9CA7-74448499CD83}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{9835E2EC-26B8-4811-87CD-18554025B6AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9835E2EC-26B8-4811-87CD-18554025B6AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9835E2EC-26B8-4811-87CD-18554025B6AD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C699343E-AB41-4C07-9CA7-74448499CD83}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C699343E-AB41-4C07-9CA7-74448499CD83}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C699343E-AB41-4C07-9CA7-74448499CD83}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C699343E-AB41-4C07-9CA7-74448499CD83}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
