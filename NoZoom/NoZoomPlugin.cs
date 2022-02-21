@@ -15,7 +15,6 @@ namespace NoZoom {
         internal static bool _initialized = false;
  
         internal void Awake() {
-            new Harmony(PluginGuid);
             Harmony.CreateAndPatchAll(typeof(NoZoomPlugin));
         }
 

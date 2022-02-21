@@ -1,4 +1,5 @@
 ﻿using BepInEx;
+using BepInEx.Logging;
 using crecheng.DSPModSave;
 using HarmonyLib;
 using NebulaAPI;
@@ -16,15 +17,18 @@ namespace LogisticsTrafficFilter {
         private const string PluginName = "LogisticsTrafficFilter";
         private const string PluginVersion = "1.0.0";
 
+        internal static ManualLogSource Log;
         internal static bool _initialized = false;
         public static UIFilterWindow _win;
 
         public string Version => PluginVersion;
 
         internal void Awake() {
-            new Harmony(PluginGuid);
-            Harmony.CreateAndPatchAll(typeof(TrafficFilterPlugin));
-            Harmony.CreateAndPatchAll(typeof(StarDistance.Patch));
+            Log = base.Logger;
+
+            var harmony = new Harmony(PluginGuid);
+            harmony.PatchAll(typeof(TrafficFilterPlugin));
+            harmony.PatchAll(typeof(StarDistance.Patch));
             NebulaModAPI.RegisterPackets(Assembly.GetExecutingAssembly());
         }
 
@@ -124,10 +128,11 @@ namespace LogisticsTrafficFilter {
                     int saveVersion = r.ReadInt32();
                     FilterProcessor.Instance.ReadSerialization(r, saveVersion);
                 } else {
+                    Log.LogWarning("LogisticsTrafficFilter save file does not match expected format");
                     FilterProcessor.Instance.Clear();
                 }
             } catch (IOException) {
-                Debug.Log("Error reading LogisticsTrafficFilter save file");
+                Log.LogError("Error loading LogisticsTrafficFilter save file");
                 FilterProcessor.Instance.Clear();
             }
         }

@@ -22,7 +22,6 @@ namespace DSP_NoErrors {
         internal void Awake() {
             allowList = Config.Bind("Settings", "allowList", "", "Space-separated list of terms to cause errors to be allowed.");
 
-            new Harmony(PluginGuid);
             Harmony.CreateAndPatchAll(typeof(HideErrorsPlugin));
         }
 
